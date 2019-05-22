@@ -1,0 +1,2 @@
+root://cms-xrdr.private.lo:2094///xrd/store/user/seyang/DeepCMeson/1-Delphes/delphes_1.root
+root://cms-xrdr.private.lo:2094///xrd/store/user/seyang/DeepCMeson/1-Delphes/delphes_10.root

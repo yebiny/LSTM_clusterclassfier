@@ -1,27 +1,23 @@
-import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "0"
-
-import ROOT, sys
+import ROOT, sys, os
 from ROOT import TLorentzVector
 from array import array
 import numpy as np
+from pprint import pprint
 
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Input, Bidirectional, Dropout
-
+from tensorflow.keras.utils import Sequence 
+from tensorflow.keras.callbacks import ModelCheckpoint
 if tf.test.is_gpu_available(cuda_only=True):
     from tensorflow.keras.layers import CuDNNLSTM as LSTM
 else:
     from tensorflow.keras.layers import LSTM
-from tensorflow.keras.utils import Sequence 
-from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.callbacks import ModelCheckpoint
-
-
 from sklearn.utils.class_weight import compute_class_weight
-from pprint import pprint
+os.environ['CUDA_VISIBLE_DEVICES'] = "0" 
+
+sys.path.append("../4-Dataset")
 from dataset import get_datasets
 
 
