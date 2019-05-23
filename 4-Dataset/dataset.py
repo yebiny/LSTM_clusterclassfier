@@ -10,7 +10,6 @@ from tensorflow.keras.layers import Dense, Input, Bidirectional, Dropout
 from tensorflow.keras.layers import LSTM
 from tensorflow.keras.utils import Sequence 
 from tensorflow.keras.callbacks import ModelCheckpoint
-
 from sklearn.utils.class_weight import compute_class_weight
 from pprint import pprint
 
@@ -35,50 +34,44 @@ class CMesonDataset(Sequence):
         for entry in range(start, end):
                        
             self.tree.GetEntry(entry)
-            dau_pt = np.array(list(self.tree.track_pt), dtype=np.float32)
-            dau_deta = np.array(list(self.tree.track_deta), dtype=np.float32)
-            dau_dphi = np.array(list(self.tree.track_dphi), dtype=np.float32)
-            dau_d0 = np.array(list(self.tree.track_d0), dtype=np.float32)
-            dau_dz = np.array(list(self.tree.track_dz), dtype=np.float32)
-            dau_xd = np.array(list(self.tree.track_xd), dtype=np.float32)
-            dau_yd = np.array(list(self.tree.track_yd), dtype=np.float32)
-            dau_zd = np.array(list(self.tree.track_zd), dtype=np.float32)
-            
-            
+            x_pt = np.array(list(self.tree.track_pt), dtype=np.float32)
+            x_deta = np.array(list(self.tree.track_deta), dtype=np.float32)
+            x_dphi = np.array(list(self.tree.track_dphi), dtype=np.float32)
+            x_d0 = np.array(list(self.tree.track_d0), dtype=np.float32)
+            x_dz = np.array(list(self.tree.track_dz), dtype=np.float32)
+            x_xd = np.array(list(self.tree.track_xd), dtype=np.float32)
+            x_yd = np.array(list(self.tree.track_yd), dtype=np.float32)
+            x_zd = np.array(list(self.tree.track_zd), dtype=np.float32)
+ 
             #Sorting
-            order_pt = np.argsort(dau_pt)
+            order_pt = np.argsort(x_pt)
                                  
-            dau_pt = dau_pt[order_pt][::-1]
-            dau_deta = dau_deta[order_pt][::-1]
-            dau_dphi = dau_dphi[order_pt][::-1]
-            dau_d0 = dau_d0[order_pt][::-1]
-            dau_dz = dau_dz[order_pt][::-1]
-            dau_xd = dau_xd[order_pt][::-1]  
-            dau_yd = dau_yd[order_pt][::-1]    
-            dau_zd = dau_zd[order_pt][::-1]
+            x_pt = x_pt[order_pt][::-1]
+            x_deta = x_deta[order_pt][::-1]
+            x_dphi = x_dphi[order_pt][::-1]
+            x_d0 = x_d0[order_pt][::-1]
+            x_dz = x_dz[order_pt][::-1]
+            x_xd = x_xd[order_pt][::-1]  
+            x_yd = x_yd[order_pt][::-1]    
+            x_zd = x_zd[order_pt][::-1]
             
-            #print jet_num, "th Jet's Dauthers are : ", len(dau_pt)
-            #print " dau_pt : "
-            #print  dau_pt
-                  
-            dau_set = []
+            x_set = []
                 
-            for i in range(0, len(dau_pt)):
-                    dau_set.append([])
-           
-                    dau_set[-1].append(dau_pt[i])
-                    dau_set[-1].append(dau_deta[i])
-                    dau_set[-1].append(dau_dphi[i])
-                    dau_set[-1].append(dau_d0[i])
-                    dau_set[-1].append(dau_dz[i])
-                    dau_set[-1].append(dau_xd[i])
-                    dau_set[-1].append(dau_yd[i])
-                    dau_set[-1].append(dau_zd[i])
+            for i in range(0, len(x_pt)):
+                    x_set.append([])
+                    x_set[-1].append(x_pt[i])
+                    x_set[-1].append(x_deta[i])
+                    x_set[-1].append(x_dphi[i])
+                    x_set[-1].append(x_d0[i])
+                    x_set[-1].append(x_dz[i])
+                    x_set[-1].append(x_xd[i])
+                    x_set[-1].append(x_yd[i])
+                    x_set[-1].append(x_zd[i])
          
-            x.append(dau_set)
+            x.append(x_set)
             
-            if (self.tree.jet_label_d0 ==1): label = 1
-            else : label = 0
+            if (self.tree.jet_label ==3): y_set = 1
+            else : y_set = 0
             
             y.append(label)
 
@@ -87,18 +80,20 @@ class CMesonDataset(Sequence):
         
         return x, y
     
-def get_datasets():        
+def get_datasets(folder_path):        
     datasets = [
-        CMesonDataset("../2-Selector/reout1.root", batch_size=256),
-        CMesonDataset("../2-Selector/reout8.root", batch_size=256),
-        CMesonDataset("../2-Selector/reout9.root", batch_size=256),
+        CMesonDataset(folderpath+'deepC_test.root', batch_size=256),
+        CMesonDataset(folderpath+'deepC_train.root', batch_size=256),
+        CMesonDataset(floderpath+'deepC_val.root', batch_size=256),
     ]
     
     trainset, valset, testset = sorted(datasets, key=lambda dset: len(dset), reverse=True)
     return trainset, valset, testset
 
 def main():
-    train_set, val_set, test_set = get_datasets()
+    folder_name = sys.argv[2]	
+    folder_path = '../3-Selector/{}/'.format(folder_name)	
+    train_set, val_set, test_set = get_datasets(folder_path)
 
     print("Train Set : ",trainset, len(trainset) )
     print("Test Set : ",testset, len(testset) )
