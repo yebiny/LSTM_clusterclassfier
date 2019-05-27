@@ -1,25 +1,25 @@
-import ROOT, sys, os
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = "1" 
+import ROOT, sys
 from ROOT import TLorentzVector
 from array import array
 import numpy as np
-from pprint import pprint
 
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Input, Bidirectional, Dropout
-from tensorflow.keras.utils import Sequence 
+from tensorflow.keras.utils import Sequence, plot_model 
 from tensorflow.keras.callbacks import ModelCheckpoint
 if tf.test.is_gpu_available(cuda_only=True):
     from tensorflow.keras.layers import CuDNNLSTM as LSTM
 else:
     from tensorflow.keras.layers import LSTM
 from sklearn.utils.class_weight import compute_class_weight
-os.environ['CUDA_VISIBLE_DEVICES'] = "0" 
+from pprint import pprint
 
 sys.path.append("../4-Dataset")
 from dataset import get_datasets
-
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '''                                                '''
@@ -76,21 +76,23 @@ def main():
     modelname = 'test'
     epochs = 1
     
-    modelname = sys.argv[1:][0]
-    epochs = int(sys.argv[1:][1])
+    if len(sys.argv) == 2:		    
+    	modelname = sys.argv[1]
+    if len(sys.argv) == 3:
+    	modelname = sys.argv[1]
+    	epochs = int(sys.argv[2])
 
     # set save path
-    savepath = '../4-Results/'+modelname+'/'
-    if os.path.isdir(savepath):
-        print("Already exist. Continue?")    
-        a = input()
-        if a != 'y': 
-            sys.exit()
-    if not os.path.isdir(savepath):
-        os.mkdir(savepath)
+    folder_path = '../3-Selector/'+modelname+'/'
+    save_path = '../6-Results/'+modelname+'/'
+    if os.path.isdir(save_path):
+        print("Already exist. Exit.")    
+        sys.exit()
+    if not os.path.isdir(save_path):
+        os.mkdir(save_path)
 
     # set datasets
-    train_set, val_set, test_set = get_datasets()
+    train_set, val_set, test_set = get_datasets(folder_path)
     tmp_x, tmp_y = train_set[0]
     x_shape = tmp_x.shape
 
@@ -98,7 +100,7 @@ def main():
     model = build_model(x_shape)
     
     # set checkpointer
-    checkpointer = ModelCheckpoint(filepath=savepath+'weights.hdf5', verbose=1, save_best_only=True)
+    checkpointer = ModelCheckpoint(filepath=save_path+'weights.hdf5', verbose=1, save_best_only=True)
 
     # training
     history = model.fit_generator(
@@ -115,9 +117,9 @@ def main():
     y_loss = history.history['loss']
    
     # save model and result informations
-    keras.utils.plot_model(model, to_file=savepath+'model_plot.png', show_shapes=True, show_layer_names=True)
+    keras.utils.plot_model(model, to_file=save_path+'model_plot.png', show_shapes=True, show_layer_names=True)
     np.savez(
-        savepath+'model_info.npz',
+        save_path+'model_info.npz',
         y_vloss = y_vloss,
         y_loss = y_loss,
         train_sig_response = train_s_res,

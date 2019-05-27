@@ -1,9 +1,9 @@
-import os
+import os,sys
 import ROOT
 from ROOT import TLorentzVector
 from array import array
 import numpy as np
-
+import glob
 from tensorflow import keras
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Input, Bidirectional, Dropout
@@ -73,32 +73,35 @@ class CMesonDataset(Sequence):
             if (self.tree.jet_label ==3): y_set = 1
             else : y_set = 0
             
-            y.append(label)
+            y.append(y_set)
 
         x = keras.preprocessing.sequence.pad_sequences(x, maxlen=15, padding='post', truncating='post', dtype=np.float32)
         y = np.array(y)
         
         return x, y
     
-def get_datasets(folder_path):        
+def get_datasets(folder_path):
+    dataset = glob.glob(folder_path+'*.root')
+    print(dataset)	
     datasets = [
-        CMesonDataset(folderpath+'deepC_test.root', batch_size=256),
-        CMesonDataset(folderpath+'deepC_train.root', batch_size=256),
-        CMesonDataset(floderpath+'deepC_val.root', batch_size=256),
+        CMesonDataset(dataset[0], batch_size=256),
+        CMesonDataset(dataset[1], batch_size=256),
+        CMesonDataset(dataset[2], batch_size=256),
     ]
     
-    trainset, valset, testset = sorted(datasets, key=lambda dset: len(dset), reverse=True)
-    return trainset, valset, testset
+    train_set, val_set, test_set = sorted(datasets, key=lambda dset: len(dset), reverse=True)
+    return train_set, val_set, test_set
 
 def main():
-    folder_name = sys.argv[2]	
+    folder_name = sys.argv[1]	
     folder_path = '../3-Selector/{}/'.format(folder_name)	
+    print(folder_name, folder_path)
     train_set, val_set, test_set = get_datasets(folder_path)
 
-    print("Train Set : ",trainset, len(trainset) )
-    print("Test Set : ",testset, len(testset) )
-    print("Val Set : ",valset, len(valset) )
-    #print( train_set[0])
+    print("Train Set : ",train_set, len(train_set) )
+    print("Val Set : ",val_set, len(val_set) )
+    print("Test Set : ",test_set, len(test_set) )
+    print(train_set[0])
 
 if __name__ == '__main__':
     main()
