@@ -7,6 +7,7 @@ import numpy as np
 
 import tensorflow as tf
 from tensorflow import keras
+from sklearn.utils.class_weight import compute_class_weight
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Input, Bidirectional, Dropout
 from tensorflow.keras.utils import Sequence, plot_model 
@@ -28,7 +29,6 @@ from dataset_rec import get_datasets
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def build_model(x_shape):
-    
     model = Sequential()
     model.add(Bidirectional(LSTM(64, return_sequences=True), input_shape=(x_shape[1],x_shape[2])))
     model.add(Bidirectional(LSTM(128)))
@@ -104,14 +104,21 @@ def main():
     
     # set checkpointer
     checkpointer = ModelCheckpoint(filepath=save_path+'weights.hdf5', verbose=1, save_best_only=True)
-
+    
+    # set weight
+    nsig = 2
+    nbkg = 38
+    w = np.concatenate([np.ones(nsig), np.zeros(nbkg)])
+    class_weight = compute_class_weight('balanced', [0, 1], w) 
+    
     # training
     history = model.fit_generator(
         generator = train_set,
         validation_data = val_set,
         steps_per_epoch = len(train_set), 
         epochs = epochs,
-        callbacks = [checkpointer]
+        callbacks = [checkpointer],
+        class_weight = class_weight
     )
     
     # evaluation

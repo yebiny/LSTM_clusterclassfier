@@ -73,13 +73,14 @@ class CMesonDataset(Sequence):
             x_array = x_array[order_pt]
             x.append(x_array)
             
-            # Set y 
-            y_array = np.array(self.tree.pticle_label, dtype=np.int64)
-            y_array = y_array[order_pt]
-            y.append(y_array)
+            # Set y
+            if (self.tree.jet_label == 3): y_value = 1
+            else:
+                 y_value = 0
+            y.append(y_value) 
 
         x = keras.preprocessing.sequence.pad_sequences(x, maxlen=self.max_len, padding='post', truncating='post', dtype=np.float32)
-        y = keras.preprocessing.sequence.pad_sequences(y, maxlen=self.max_len, padding='post', truncating='post', dtype=np.int64)
+        y = np.array(y)
         return x, y
     
 def get_datasets(folder_path, batch_size, max_len):

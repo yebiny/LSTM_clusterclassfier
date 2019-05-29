@@ -1,9 +1,9 @@
 ---------------------------------------------------
 ---------------------------------------------------
-   	$ python dataset.py [ Input Name ] 
+            $ python dataset.py [ Title ] 
 
      Input Example : ../3-Selector/Input Folder
-         You Just Use Input Folder ""Name"" 
+        You Just Use Folder Name as [ Title ] 
 ---------------------------------------------------
 ---------------------------------------------------
 

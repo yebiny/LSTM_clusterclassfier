@@ -19,7 +19,7 @@ from sklearn.utils.class_weight import compute_class_weight
 from pprint import pprint
 
 sys.path.append("../4-Dataset")
-from dataset import get_datasets
+from dataset_cfy import get_datasets
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '''                                                '''
@@ -33,6 +33,7 @@ def build_model(x_shape):
     model.add(Bidirectional(LSTM(64, return_sequences=True), input_shape=(x_shape[1],x_shape[2])))
     model.add(Bidirectional(LSTM(128)))
     model.add(Dropout(0.5))
+    model.add(Dense(10, activation='sigmoid'))
     model.add(Dense(1, activation='sigmoid'))
     model.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
     return model
@@ -75,7 +76,9 @@ def main():
     # set name
     modelname = 'test'
     epochs = 1
-    
+    batch_size = 256
+    max_len = 20
+         
     if len(sys.argv) == 2:		    
     	modelname = sys.argv[1]
     if len(sys.argv) == 3:
@@ -84,7 +87,7 @@ def main():
 
     # set save path
     folder_path = '../3-Selector/'+modelname+'/'
-    save_path = '../6-Results/'+modelname+'/'
+    save_path = '../6-Results/classify/'+modelname+'/'
     if os.path.isdir(save_path):
         print("Already exist. Exit.")    
         sys.exit()
@@ -92,7 +95,7 @@ def main():
         os.mkdir(save_path)
 
     # set datasets
-    train_set, val_set, test_set = get_datasets(folder_path)
+    train_set, val_set, test_set = get_datasets(folder_path, batch_size, max_len)
     tmp_x, tmp_y = train_set[0]
     x_shape = tmp_x.shape
 
