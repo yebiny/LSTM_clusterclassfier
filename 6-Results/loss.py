@@ -16,10 +16,10 @@ vacc=info['y_vacc']
 acc =info['y_acc' ]
 
 x_len = np.arange(len(loss))
-plt.plot(x_len, vloss,marker='.', c = 'red', label = 'Loss: Valdation-set')
-plt.plot(x_len, loss, marker='.', c = 'blue',label = 'Loss: Train-Set')
 plt.plot(x_len, vacc,marker='.', c = 'darkorange', label = 'Acc: Valdation-set')
 plt.plot(x_len, acc, marker='.', c = 'green',label = 'Acc: Train-Set')
+plt.plot(x_len, vloss,marker='.', c = 'red', label = 'Loss: Valdation-set')
+plt.plot(x_len, loss, marker='.', c = 'blue',label = 'Loss: Train-Set')
 plt.legend(fontsize=10)
 plt.grid()
 plt.savefig(folder+"/loss.png")

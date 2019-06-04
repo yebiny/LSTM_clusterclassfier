@@ -79,7 +79,7 @@ def main():
     
     print("Save results")
     np.savez(
-        save_path+'/eval_result.npz',
+        save_path+'/info_eval.npz',
         # learning curve
         #y_vloss = y_vloss,
         #y_loss = y_loss,

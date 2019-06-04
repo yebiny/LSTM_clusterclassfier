@@ -25,7 +25,6 @@ h_test_bkg = TH1F("test_bkg", "test_bkg" , 50, 0, 1.)
 h_train_sig =TH1F("train_sig","train_sig", 50, 0, 1.)
 h_train_bkg =TH1F("train_bkg","train_bkg", 50, 0, 1.)
 h_test_sig.SetXTitle("Model response")
-h_test_sig.GetXaxis.SetTitleSize(10)
 hists = [h_test_sig, h_test_bkg, h_train_sig, h_train_bkg]
 print("save hists")
 
