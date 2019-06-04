@@ -24,14 +24,16 @@ class CMesonDataset(Sequence):
         
         # Input X variables
         self.x_names = [
-            'track_pt', 
+            'track_pt',
+            'track_deta',
+            'track_dphi',
             'track_d0',
             'track_dz',
             'track_xd',
             'track_yd',
             'track_zd',
-            'track_deta',
-            'track_dphi',
+            'track_l',
+            'track_errd0', 
             'track_charge',
         ]
         
@@ -74,7 +76,7 @@ class CMesonDataset(Sequence):
             x.append(x_array)
             
             # Set y
-            if (self.tree.jet_label == 3): y_value = 1
+            if (self.tree.jet_label == 4): y_value = 1
             else:
                  y_value = 0
             y.append(y_value) 
@@ -83,8 +85,8 @@ class CMesonDataset(Sequence):
         y = np.array(y)
         return x, y
     
-def get_datasets(folder_path, batch_size, max_len):
-    dataset = glob.glob(folder_path+'*.root')
+def get_datasets(data_path, batch_size, max_len):
+    dataset = glob.glob(data_path+'*.root')
     print(dataset)	
     datasets = [
         CMesonDataset(dataset[0], batch_size, max_len),
@@ -100,14 +102,16 @@ def main():
     max_len = 5
 
     folder_name = sys.argv[1]	
-    folder_path = '../3-Selector/{}/'.format(folder_name)	
-    print(folder_name, folder_path)
-    train_set, val_set, test_set = get_datasets(folder_path, batch_size, max_len)
+    data_path = '../3-Selector/{}/'.format(folder_name)	
+    print(folder_name, data_path)
+    train_set, val_set, test_set = get_datasets(data_path, batch_size, max_len)
 
     print("Train Set : ",train_set, len(train_set) )
     print("Val Set : ",val_set, len(val_set) )
     print("Test Set : ",test_set, len(test_set) )
-    print(train_set[50])
+    print(train_set[0])
+    print("=====================================================================")
+    print(train_set[1])
 
 if __name__ == '__main__':
     main()
