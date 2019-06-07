@@ -1,3 +1,4 @@
+#!/bin/usr/python
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = "3" 
 import ROOT, sys
@@ -19,7 +20,7 @@ else:
 from sklearn.utils.class_weight import compute_class_weight
 from pprint import pprint
 
-sys.path.append("../4-Dataset")
+sys.path.append("/home/yyoun/deepcmeson/4-Dataset")
 from dataset_cfy import get_datasets
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -34,6 +35,7 @@ def build_model(x_shape):
     model.add(Bidirectional(LSTM(128)))
     model.add(Dropout(0.5))
     model.add(Dense(64, activation='relu'))
+    model.add(Dense(32, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
     model.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
     return model

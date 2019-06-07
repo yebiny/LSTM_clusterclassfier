@@ -40,13 +40,6 @@ for each in test_sig_response:
 print( "fill test sig"  ) 
 for each in test_bkg_response: 
     h_test_bkg.Fill(each)
-
-h_train_sig.SetFillColorAlpha(ROOT.kRed, 0.3)
-h_train_bkg.SetFillColorAlpha(ROOT.kBlue,0.3)
-h_test_sig.SetLineColor(ROOT.kOrange+8)
-h_test_bkg.SetLineColor(ROOT.kAzure)
-h_test_sig.SetLineWidth(5)
-h_test_bkg.SetLineWidth(5)
 print("fill test bkg") 
 
 h_test_sig.Scale(1.0/h_test_sig.Integral())
@@ -61,8 +54,19 @@ max_value = max(
     h_train_sig.GetMaximum(),
     h_train_bkg.GetMaximum(),
 )
-
 h_test_sig.SetMaximum(1.4*max_value)
+
+#h_train_sig.SetFillColorAlpha(ROOT.kRed, 0.3)
+#h_train_bkg.SetFillColorAlpha(ROOT.kBlue,0.3)
+h_train_sig.SetFillStyle(3002)
+h_train_bkg.SetFillStyle(3002)
+h_train_sig.SetFillColor(ROOT.kOrange+10)
+h_train_bkg.SetFillColor(ROOT.kBlue)
+h_test_sig.SetLineColor(ROOT.kRed-4)
+h_test_bkg.SetLineColor(ROOT.kAzure+7)
+h_test_sig.SetLineWidth(4)
+h_test_bkg.SetLineWidth(4)
+
 h_test_sig.Draw("HIST")
 h_test_bkg.Draw( "HIST same")
 h_train_sig.Draw("HIST same")
