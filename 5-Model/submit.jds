@@ -1,0 +1,16 @@
+#
+executable = run.sh
+universe = vanilla
+log = condor.log
+getenv = True
+
+should_transfer_files = YES
+
+# arguments = pwg_1_full 30
+
+when_to_transfer_output = ON_EXIT
+output = job.log
+error = job.err
+
+request_gpus = 1
+queue

@@ -102,7 +102,7 @@ def main():
     max_len = 5
 
     folder_name = sys.argv[1]	
-    data_path = '../3-Selector/{}/'.format(folder_name)	
+    data_path = '/home/yyoun/deepcmeson/3-Selector/{}/'.format(folder_name)	
     print(folder_name, data_path)
     train_set, val_set, test_set = get_datasets(data_path, batch_size, max_len)
 

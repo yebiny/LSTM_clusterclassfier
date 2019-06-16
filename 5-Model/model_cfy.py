@@ -1,6 +1,6 @@
 #!/bin/usr/python
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "3" 
+# os.environ['CUDA_VISIBLE_DEVICES'] = "3" 
 import ROOT, sys
 from ROOT import TLorentzVector
 from array import array
@@ -76,7 +76,7 @@ def evaluate(model,train_set, test_set):
 def main():
 
     # set name
-    data_name = 'test'
+    data_name = 'pwg_1_mini'
     epochs = 1
     batch_size = 256
     max_len = 15
@@ -88,8 +88,8 @@ def main():
     	epochs = int(sys.argv[2])
 
     # set save path
-    data_path = '../3-Selector/'+data_name+'/'
-    save_path = '../6-Results/classify/'+data_name+'/current/'
+    data_path = '/home/yyoun/deepcmeson/3-Selector/'+data_name+'/'
+    save_path = '/home/yyoun/deepcmeson/6-Results/classify/'+data_name+'/current/'
     if os.path.isdir(save_path):
         print("Already exist. Exit.")    
         sys.exit()
