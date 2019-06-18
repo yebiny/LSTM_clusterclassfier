@@ -25,13 +25,13 @@ class CMesonDataset(Sequence):
         # Input X variables
         self.x_names = [
             'track_pt', 
-            'track_d0',
-            'track_dz',
-            'track_xd',
-            'track_yd',
-            'track_zd',
             'track_deta',
             'track_dphi',
+            'track_dz',
+            'track_errd0',
+            #'track_xd',
+            #'track_yd',
+            #'track_zd',
             'track_charge',
         ]
         
@@ -69,13 +69,13 @@ class CMesonDataset(Sequence):
             x_array = np.concatenate([x_array, x_pId], axis=1)
             
             # Sort by PT
-            order_pt = np.argsort(self.tree.track_pt)[::-1]
-            x_array = x_array[order_pt]
+            #order_pt = np.argsort(self.tree.track_pt)[::-1]
+            #x_array = x_array[order_pt]
             x.append(x_array)
             
             # Set y 
-            y_array = np.array(self.tree.pticle_label, dtype=np.int64)
-            y_array = y_array[order_pt]
+            y_array = np.array(self.tree.dau_label, dtype=np.int64)
+            #y_array = y_array[order_pt]
             y.append(y_array)
 
         x = keras.preprocessing.sequence.pad_sequences(x, maxlen=self.max_len, padding='post', truncating='post', dtype=np.float32)
@@ -106,7 +106,7 @@ def main():
     print("Train Set : ",train_set, len(train_set) )
     print("Val Set : ",val_set, len(val_set) )
     print("Test Set : ",test_set, len(test_set) )
-    print(train_set[50])
+    print(train_set[0])
 
 if __name__ == '__main__':
     main()

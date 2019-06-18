@@ -76,7 +76,7 @@ class CMesonDataset(Sequence):
             x.append(x_array)
             
             # Set y
-            if (self.tree.jet_label == 4): y_value = 1
+            if (self.tree.jet_label >= 4): y_value = 1
             else:
                  y_value = 0
             y.append(y_value) 
