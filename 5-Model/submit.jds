@@ -1,12 +1,12 @@
 #
-executable = run.sh
+executable = model_cfy.py
 universe = vanilla
 log = condor.log
 getenv = True
 
 should_transfer_files = YES
 
-# arguments = pwg_1_full 30
+arguments = pwg_1_full 30
 
 when_to_transfer_output = ON_EXIT
 output = job.log

@@ -28,13 +28,13 @@ from dataset_rec import get_datasets
 '''                                                '''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def build_model(x_shape):
+def build_model(x_shape,max_len):
     model = Sequential()
     model.add(Bidirectional(LSTM(64, return_sequences=True), input_shape=(x_shape[1],x_shape[2])))
     model.add(Bidirectional(LSTM(128)))
     model.add(Dropout(0.5))
     model.add(Dense(40, activation='sigmoid'))
-    model.add(Dense(20, activation='sigmoid'))
+    model.add(Dense(max_len, activation='sigmoid'))
     model.compile('adam',loss='categorical_crossentropy', metrics=['accuracy'])
     return model
 
@@ -75,9 +75,9 @@ def main():
 
     # set name
     modelname = 'test'
-    epochs = 1
+    epochs = 10
     batch_size = 256
-    max_len = 20
+    max_len = 5
     
     if len(sys.argv) == 2:          
         modelname = sys.argv[1]
@@ -100,14 +100,14 @@ def main():
     x_shape = tmp_x.shape
 
     # set model
-    model = build_model(x_shape)
+    model = build_model(x_shape,max_len)
     
     # set checkpointer
     checkpointer = ModelCheckpoint(filepath=save_path+'weights.hdf5', verbose=1, save_best_only=True)
     
     # set weight
     nsig = 2
-    nbkg = 38
+    nbkg = 3
     w = np.concatenate([np.ones(nsig), np.zeros(nbkg)])
     class_weight = compute_class_weight('balanced', [0, 1], w) 
     
@@ -118,7 +118,7 @@ def main():
         steps_per_epoch = len(train_set), 
         epochs = epochs,
         callbacks = [checkpointer],
-        class_weight = class_weight
+        #class_weight = class_weight
     )
     
     # save model image

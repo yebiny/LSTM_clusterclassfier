@@ -1,4 +1,4 @@
-#!/bin/usr/python
+#!/usr/bin/python
 import os
 # os.environ['CUDA_VISIBLE_DEVICES'] = "3" 
 import ROOT, sys
@@ -21,7 +21,9 @@ from sklearn.utils.class_weight import compute_class_weight
 from pprint import pprint
 
 sys.path.append("/home/yyoun/deepcmeson/4-Dataset")
+sys.path.append("/home/yyoun/deepcmeson/5-Model/models")
 from dataset_cfy import get_datasets
+from rnn_cfy import build_model
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '''                                                '''
@@ -56,7 +58,7 @@ def getyinfo(model, xset):
     
     return y_true, y_score
 
-def evaluate(model,train_set, test_set):
+def evaluate(model, train_set, test_set):
     
     train_y_true, train_y_score = getyinfo(model, train_set)
     test_y_true, test_y_score = getyinfo(model, test_set)
@@ -115,6 +117,7 @@ def main():
         validation_data = val_set,
         steps_per_epoch = len(train_set), 
         epochs = epochs,
+        verbose = 2,
         callbacks = [checkpointer]
     )
     print("Trainig End") 
