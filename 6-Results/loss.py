@@ -9,7 +9,8 @@ import os,sys
 
 folder = './'+sys.argv[1:][0]
 
-info = np.load(folder+"/info_learning.npz")
+#info = np.load(folder+"/info_learning.npz")
+info = np.load(folder+"/info_eval.npz")
 vloss=info['y_vloss']
 loss =info['y_loss' ]
 vacc=info['y_vacc']

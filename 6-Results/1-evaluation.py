@@ -72,19 +72,9 @@ def main():
     print("Evaluate")
     train_s_res, train_b_res, test_s_res, test_b_res, test_y_true, test_y_score = evaluate(model, train_set, test_set)
     
-    #y_vloss = history.history['val_loss']
-    #y_loss = history.history['loss']
-    #y_acc = history.history['acc']   
-    #y_vacc = history.history['val_acc']   
-    
     print("Save results")
     np.savez(
         save_path+'/info_eval.npz',
-        # learning curve
-        #y_vloss = y_vloss,
-        #y_loss = y_loss,
-        #y_acc = y_acc,
-        #y_vacc = y_vacc,
         # responce
         train_sig_response = train_s_res,
         train_bkg_response = train_b_res,

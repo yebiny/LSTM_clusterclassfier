@@ -11,7 +11,6 @@ folder = sys.argv[1:][0]
 
 # Load values
 info = np.load(folder+"/info_eval.npz")
-#info = np.load(folder+"/eval_result.npz")
 train_sig_response =info['train_sig_response']
 train_bkg_response =info['train_bkg_response']
 test_sig_response = info['test_sig_response' ]

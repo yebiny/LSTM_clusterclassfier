@@ -9,7 +9,6 @@ from matplotlib.lines import Line2D
 folder = './'+sys.argv[1:][0]
 
 info = np.load(folder+"/info_eval.npz")
-#info = np.load(folder+"/eval_result.npz")
 y_true = info['test_y_true' ]
 y_score =info['test_y_score']
 
@@ -30,8 +29,8 @@ roc_curve = Line2D(
     color='darkorange', alpha=0.8, lw=3)
 
 ax.add_line(roc_curve)
-ax.set_xlabel('Signal Efficiency',fontsize=12)
-ax.set_ylabel('Background Rejection', fontsize=12)
+ax.set_xlabel('True Positive Rates (Signal Efficiency)',fontsize=12)
+ax.set_ylabel('True Negative Rates (Background Rejection)', fontsize=12)
 ax.grid()
 ax.legend()
 ax.set_title("ROC Curve",fontsize=15)
