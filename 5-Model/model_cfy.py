@@ -1,35 +1,22 @@
 #!/usr/bin/python
 import os
-# os.environ['CUDA_VISIBLE_DEVICES'] = "3" 
+#os.environ['CUDA_VISIBLE_DEVICES'] = "0" 
 import ROOT, sys
-from ROOT import TLorentzVector
-from array import array
 import numpy as np
+from ROOT   import TLorentzVector
+from array  import array
+from pprint import pprint
 
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Input, Bidirectional, Dropout
-from tensorflow.keras.utils import Sequence, plot_model 
+from tensorflow.keras.utils import plot_model 
 from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.models import load_model
-if tf.test.is_gpu_available(cuda_only=True):
-    from tensorflow.keras.layers import CuDNNLSTM as LSTM
-else:
-    from tensorflow.keras.layers import LSTM
-from sklearn.utils.class_weight import compute_class_weight
-from pprint import pprint
+from tensorflow.keras.callbacks import CSVLogger
 
 sys.path.append("/home/yyoun/deepcmeson/4-Dataset")
-sys.path.append("/home/yyoun/deepcmeson/5-Model/models")
 from dataset_cfy import get_datasets
-from rnn_cfy import build_model
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'''                                                '''
-'''   python3 model.py [title] [number of epochs]  '''
-'''                                                '''
-''''''''''''''''''''''''''''''''''''''''''''''''''''''
+sys.path.append("/home/yyoun/deepcmeson/5-Model/version_model")
+from rnn_cfy_v1 import build_model
 
 def getyinfo(model, xset):
     
@@ -66,11 +53,11 @@ def evaluate(model, train_set, test_set):
 
 def main():
 
-    # set name
+    # setting
     data_name = 'pwg_1_mini'
     epochs = 1
     batch_size = 256
-    max_len = 15
+    max_len = 25
          
     if len(sys.argv) == 2:		    
     	data_name = sys.argv[1]
@@ -80,10 +67,14 @@ def main():
 
     # set save path
     data_path = '/home/yyoun/deepcmeson/3-Selector/'+data_name+'/'
-    save_path = '/home/yyoun/deepcmeson/6-Results/classify/'+data_name+'/current/'
+    save_fold = '/home/yyoun/deepcmeson/6-Results/classify/'+data_name
+    save_path = save_fold+'/current/'
     if os.path.isdir(save_path):
-        print("Already exist. Exit.")    
+        print(save_path," is Already exist. Exit.")    
         sys.exit()
+    if not os.path.isdir(save_fold):
+        os.mkdir(save_fold)
+        print("Make ", save_fold)    
     if not os.path.isdir(save_path):
         os.mkdir(save_path)
 
@@ -95,9 +86,15 @@ def main():
     # set model
     model = build_model(x_shape)
     
-    # set checkpointer, model and save
-    checkpointer = ModelCheckpoint(filepath=save_path+'weights.hdf5', verbose=1, save_best_only=True)
-    model.save(save_path+'rnn_model.h5')
+    # save model plot
+    print("Save modelplot") 
+    keras.utils.plot_model(model, to_file=save_path+'model_plot.png', show_shapes=True, show_layer_names=True)
+    
+    # set checkpointer, model save
+    checkpointer = ModelCheckpoint(filepath=save_path+'model.hdf5', verbose=1, save_best_only=True)
+    #model.save(save_path+'rnn_model.h5')
+
+    csv_logger = CSVLogger(save_path + 'CSVLogger.csv')
 
     # training
     print("Trainig Start") 
@@ -107,7 +104,7 @@ def main():
         steps_per_epoch = len(train_set), 
         epochs = epochs,
         verbose = 2,
-        callbacks = [checkpointer]
+        callbacks = [checkpointer, csv_logger]
     )
     print("Trainig End") 
    
@@ -143,9 +140,6 @@ def main():
         test_bkg_response = test_b_res,
     )
     
-    # save model plot
-    print("Save modelplot") 
-    keras.utils.plot_model(model, to_file=save_path+'model_plot.png', show_shapes=True, show_layer_names=True)
 
 if __name__ == '__main__':
     main()
