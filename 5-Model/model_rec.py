@@ -1,5 +1,6 @@
+#!/usr/bin/python
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "2" 
+os.environ['CUDA_VISIBLE_DEVICES'] = "3" 
 import ROOT, sys
 from ROOT import TLorentzVector
 from array import array
@@ -7,11 +8,11 @@ import numpy as np
 
 import tensorflow as tf
 from tensorflow import keras
-from sklearn.utils.class_weight import compute_class_weight
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Input, Bidirectional, Dropout
 from tensorflow.keras.utils import Sequence, plot_model 
 from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.models import load_model
 if tf.test.is_gpu_available(cuda_only=True):
     from tensorflow.keras.layers import CuDNNLSTM as LSTM
 else:
@@ -19,24 +20,10 @@ else:
 from sklearn.utils.class_weight import compute_class_weight
 from pprint import pprint
 
-sys.path.append("../4-Dataset")
-from dataset_rec import get_datasets
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'''                                                '''
-'''   python3 model.py [title] [number of epochs]  '''
-'''                                                '''
-''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-def build_model(x_shape,max_len):
-    model = Sequential()
-    model.add(Bidirectional(LSTM(64, return_sequences=True), input_shape=(x_shape[1],x_shape[2])))
-    model.add(Bidirectional(LSTM(128)))
-    model.add(Dropout(0.5))
-    model.add(Dense(40, activation='sigmoid'))
-    model.add(Dense(max_len, activation='sigmoid'))
-    model.compile('adam',loss='categorical_crossentropy', metrics=['accuracy'])
-    return model
+sys.path.append("/home/yyoun/deepcmeson/4-Dataset")
+from dataset_cfy import get_datasets
+sys.path.append("/home/yyoun/deepcmeson/5-Model/version_model")
+from rnn_rec import build_model
 
 def getyinfo(model, xset):
     
@@ -74,20 +61,20 @@ def evaluate(model, train_set, test_set):
 def main():
 
     # set name
-    modelname = 'test'
-    epochs = 10
+    data_name = 'pwg_1_mini'
+    epochs = 1
     batch_size = 256
     max_len = 5
-    
-    if len(sys.argv) == 2:          
-        modelname = sys.argv[1]
+         
+    if len(sys.argv) == 2:		    
+    	data_name = sys.argv[1]
     if len(sys.argv) == 3:
-        modelname = sys.argv[1]
-        epochs = int(sys.argv[2])
+    	data_name = sys.argv[1]
+    	epochs = int(sys.argv[2])
 
     # set save path
-    folder_path = '../3-Selector/'+modelname+'/'
-    save_path = '../6-Results/reconstruction/'+modelname+'/'
+    data_path = '/home/yyoun/deepcmeson/3-Selector/'+data_name+'/'
+    save_path = '/home/yyoun/deepcmeson/6-Results/reconstruction/'+data_name+'/current/'
     if os.path.isdir(save_path):
         print("Already exist. Exit.")    
         sys.exit()
@@ -95,50 +82,56 @@ def main():
         os.mkdir(save_path)
 
     # set datasets
-    train_set, val_set, test_set = get_datasets(folder_path, batch_size, max_len)
+    train_set, val_set, test_set = get_datasets(data_path, batch_size, max_len)
     tmp_x, tmp_y = train_set[0]
     x_shape = tmp_x.shape
 
     # set model
-    model = build_model(x_shape,max_len)
+    model = build_model(x_shape)
     
-    # set checkpointer
+    # save model plot
+    print("Save modelplot") 
+    keras.utils.plot_model(model, to_file=save_path+'model_plot.png', show_shapes=True, show_layer_names=True)
+    
+    # set checkpointer, model and save
     checkpointer = ModelCheckpoint(filepath=save_path+'weights.hdf5', verbose=1, save_best_only=True)
-    
-    # set weight
-    nsig = 2
-    nbkg = 3
-    w = np.concatenate([np.ones(nsig), np.zeros(nbkg)])
-    class_weight = compute_class_weight('balanced', [0, 1], w) 
-    
+    model.save(save_path+'rnn_model.h5')
+
     # training
+    print("Trainig Start") 
     history = model.fit_generator(
         generator = train_set,
         validation_data = val_set,
         steps_per_epoch = len(train_set), 
         epochs = epochs,
-        callbacks = [checkpointer],
-        #class_weight = class_weight
+        #verbose = 2,
+        callbacks = [checkpointer]
     )
-    
-    # save model image
-    keras.utils.plot_model(model, to_file=save_path+'model_plot.png', show_shapes=True, show_layer_names=True)
-    
-    # evaluation
-    train_s_res, train_b_res, test_s_res, test_b_res, test_y_true, test_y_score = evaluate(model, train_set, test_set)
-    y_vloss = history.history['val_loss']
-    y_loss = history.history['loss']
+    print("Trainig End") 
    
-    # save result informations
+    # save loos and acc
+    print("Save loss and acc") 
+    y_loss = history.history['loss']
+    y_acc = history.history['acc']   
+    y_vloss = history.history['val_loss']
+    y_vacc = history.history['val_acc']   
     np.savez(
-        save_path+'model_info.npz',
-        # learning curve
-        y_vloss=y_vloss,
+        save_path+'info_learning.npz',
         y_loss = y_loss,
-        train_len=len(train_set),
-        val_len  =len(val_set),
-        test_len =len(test_set),
-        # ROC curve
+        y_acc = y_acc,
+        y_vloss = y_vloss,
+        y_vacc = y_vacc
+    )
+
+    # evaluation
+    print("Evaluation") 
+    train_s_res, train_b_res, test_s_res, test_b_res, test_y_true, test_y_score = evaluate(model, train_set, test_set)
+
+    # save evaluation results
+    print("Save results") 
+    np.savez(
+        save_path+'info_eval.npz',
+        # roc curve
         test_y_true = test_y_true,
         test_y_score=test_y_score,
         # responce 
@@ -147,7 +140,7 @@ def main():
         test_sig_response = test_s_res,
         test_bkg_response = test_b_res,
     )
+    
 
 if __name__ == '__main__':
     main()
-
