@@ -1,25 +1,19 @@
-import os,sys
+import os, sys, glob 
 import ROOT
 from ROOT import TLorentzVector
 from array import array
 import numpy as np
-import glob
 from tensorflow import keras
-from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Input, Bidirectional, Dropout
-from tensorflow.keras.layers import LSTM
 from tensorflow.keras.utils import Sequence 
-from tensorflow.keras.callbacks import ModelCheckpoint
-from sklearn.utils.class_weight import compute_class_weight
 from pprint import pprint
 
 class CMesonDataset(Sequence):
 
     def __init__(self, path, batch_size, max_len):
-        self.root_file = ROOT.TFile(path)
+        self.root_file  = ROOT.TFile(path)
         self.tree = self.root_file.delphys
-        self.num_entries = self.tree.GetEntries()
         self.batch_size = batch_size
+        self.num_entries= self.tree.GetEntries()
         self.max_len = max_len
         
         # Input X variables
@@ -87,7 +81,6 @@ class CMesonDataset(Sequence):
     
 def get_datasets(data_path, batch_size, max_len):
     dataset = glob.glob(data_path+'*.root')
-    print(dataset)	
     datasets = [
         CMesonDataset(dataset[0], batch_size, max_len),
         CMesonDataset(dataset[1], batch_size, max_len),
@@ -98,18 +91,16 @@ def get_datasets(data_path, batch_size, max_len):
     return train_set, val_set, test_set
 
 def main():
-    batch_size = 10
-    max_len = 5
+    batch_size = 1
+    max_len = 10
 
     folder_name = sys.argv[1]	
     data_path = '/home/yyoun/deepcmeson/3-Selector/{}/'.format(folder_name)	
-    print(folder_name, data_path)
+    
     train_set, val_set, test_set = get_datasets(data_path, batch_size, max_len)
-
     print("Train Set : ",train_set, len(train_set) )
     print("Val Set : ",val_set, len(val_set) )
     print("Test Set : ",test_set, len(test_set) )
-    print(train_set[0])
     print("=====================================================================")
     print(train_set[1])
 

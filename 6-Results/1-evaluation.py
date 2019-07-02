@@ -52,7 +52,7 @@ def main():
 
     #default
     batch_size = 256
-    max_len = 15
+    max_len = 25
 
     # set name
     data_name = sys.argv[1]
@@ -65,8 +65,9 @@ def main():
     x_shape = tmp_x.shape
  
     print("Loading model.")
-    model = tf.keras.models.load_model(save_path+'/rnn_model.h5')
-    model.load_weights(save_path+'/weights.hdf5')
+    #model = tf.keras.models.load_model(save_path+'/rnn_model.h5')
+    model = tf.keras.models.load_model(save_path+'/model.hdf5')
+    #model.load_weights(save_path+'/weights.hdf5')
     model.summary()
     
     print("Evaluate")
