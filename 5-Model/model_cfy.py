@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import os
-#os.environ['CUDA_VISIBLE_DEVICES'] = "0" 
+os.environ['CUDA_VISIBLE_DEVICES'] = "0" 
 import ROOT, sys
 import numpy as np
 from ROOT   import TLorentzVector
@@ -16,7 +16,7 @@ from tensorflow.keras.callbacks import CSVLogger
 sys.path.append("/home/yyoun/deepcmeson/4-Dataset")
 from dataset_cfy import get_datasets
 sys.path.append("/home/yyoun/deepcmeson/5-Model/version_model")
-from rnn_cfy_v1 import build_model
+from rnn_cfy import *
 
 def getyinfo(model, xset):
     
@@ -52,31 +52,42 @@ def evaluate(model, train_set, test_set):
     return train_sig_response, train_bkg_response, test_sig_response, test_bkg_response, test_y_true, test_y_score
 
 def main():
-
     # setting
-    data_name = 'pwg_1_mini'
-    epochs = 1
-    batch_size = 256
-    max_len = 25
-         
-    if len(sys.argv) == 2:		    
-    	data_name = sys.argv[1]
-    if len(sys.argv) == 3:
-    	data_name = sys.argv[1]
-    	epochs = int(sys.argv[2])
+    if len(sys.argv) == 6:
+        data_name = sys.argv[1]
+        batch_size = int(sys.argv[2])
+        max_len = int(sys.argv[3])
+        epochs = int(sys.argv[4])
+        model_ver = sys.argv[5]
+    else:
+        print "Check argv condition"
+        sys.exit()
 
     # set save path
     data_path = '/home/yyoun/deepcmeson/3-Selector/'+data_name+'/'
-    save_fold = '/home/yyoun/deepcmeson/6-Results/classify/'+data_name
-    save_path = save_fold+'/current/'
-    if os.path.isdir(save_path):
-        print(save_path," is Already exist. Exit.")    
-        sys.exit()
-    if not os.path.isdir(save_fold):
-        os.mkdir(save_fold)
-        print("Make ", save_fold)    
-    if not os.path.isdir(save_path):
-        os.mkdir(save_path)
+    save_fold = '/home/yyoun/deepcmeson/6-Results/cfy/'
+    count_fold= len(os.walk(save_fold).next()[1])+1
+    test_ver  = 'test_'+str(count_fold)
+    save_path = save_fold+test_ver+'/'
+    os.mkdir(save_path)
+    
+    print test_ver
+    
+    # log
+    log ='''
+[ {test_ver} ]
+
+data name = {data_name}
+batch size = {batch_size}
+max length = {max_len}
+epochs = {epochs}
+model = {model_ver}
+------------------------------'''.format(test_ver=test_ver, data_name=data_name, batch_size=batch_size,
+                                         max_len=max_len, epochs=epochs, model_ver=model_ver)
+    with open(save_fold + 'log.txt', 'a') as log_file:
+        log_file.write(log)
+    with open(save_path + 'log.txt', 'w') as log_file:
+        log_file.write(log)
 
     # set datasets
     train_set, val_set, test_set = get_datasets(data_path, batch_size, max_len)
@@ -84,16 +95,16 @@ def main():
     x_shape = tmp_x.shape
 
     # set model
-    model = build_model(x_shape)
-    
+    model = get_model_fn(model_ver)(x_shape)
+
     # save model plot
     print("Save modelplot") 
     keras.utils.plot_model(model, to_file=save_path+'model_plot.png', show_shapes=True, show_layer_names=True)
     
     # set checkpointer, model save
     checkpointer = ModelCheckpoint(filepath=save_path+'model.hdf5', verbose=1, save_best_only=True)
-    #model.save(save_path+'rnn_model.h5')
 
+    # save loss and acc
     csv_logger = CSVLogger(save_path + 'CSVLogger.csv')
 
     # training
@@ -103,12 +114,12 @@ def main():
         validation_data = val_set,
         steps_per_epoch = len(train_set), 
         epochs = epochs,
-        verbose = 2,
+        #verbose = 2,
         callbacks = [checkpointer, csv_logger]
     )
     print("Trainig End") 
    
-    # save loos and acc
+    # save loos and acc 
     print("Save loss and acc") 
     y_loss = history.history['loss']
     y_acc = history.history['acc']   
@@ -121,6 +132,7 @@ def main():
         y_vloss = y_vloss,
         y_vacc = y_vacc
     )
+
 
     # evaluation
     print("Evaluation") 
