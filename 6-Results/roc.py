@@ -19,7 +19,6 @@ tnr = 1-fpr
 auc = metrics.auc(x=tpr, y=tnr)
 
 # plot
-print 'plotting..'
 title = "ROC Curve"
 label = "RNN (AUC = {:.3f})".format(auc)
 fig, ax = plt.subplots(figsize=(8,6))
@@ -36,5 +35,4 @@ ax.legend()
 ax.set_title("ROC Curve",fontsize=15)
 
 fig.savefig('./'+folder+'/roc_auc.png')
-print 'sved at', folder
 plt.close()

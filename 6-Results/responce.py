@@ -25,27 +25,21 @@ h_train_sig =TH1F("train_sig","train_sig", 50, 0, 1.)
 h_train_bkg =TH1F("train_bkg","train_bkg", 50, 0, 1.)
 h_test_sig.SetXTitle("Model response")
 hists = [h_test_sig, h_test_bkg, h_train_sig, h_train_bkg]
-print("save hists")
 
 # Fill
 for each in train_sig_response:
     h_train_sig.Fill(each)
-print( "fill train sig")
 for each in train_bkg_response:
     h_train_bkg.Fill(each)
-print( "fill train bkg")
 for each in test_sig_response: 
     h_test_sig.Fill(each)
-print( "fill test sig"  ) 
 for each in test_bkg_response: 
     h_test_bkg.Fill(each)
-print("fill test bkg") 
 
 h_test_sig.Scale(1.0/h_test_sig.Integral())
 h_test_bkg.Scale(1.0/h_test_bkg.Integral())
 h_train_sig.Scale(1.0/h_train_sig.Integral())
 h_train_bkg.Scale(1.0/h_train_bkg.Integral())
-print("scaleed")
 
 max_value = max(
     h_test_sig.GetMaximum(),
