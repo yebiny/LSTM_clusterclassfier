@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "0" 
+#os.environ['CUDA_VISIBLE_DEVICES'] = "0" 
 import ROOT, sys
 import numpy as np
 from ROOT   import TLorentzVector
@@ -10,8 +10,7 @@ from pprint import pprint
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.utils import plot_model 
-from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.callbacks import CSVLogger
+from tensorflow.keras.callbacks import ModelCheckpoint, CSVLogger, ReduceLROnPlateau
 
 sys.path.append("/home/yyoun/deepcmeson/4-Dataset")
 from dataset_cfy import get_datasets
@@ -103,6 +102,7 @@ model = {model_ver}
     
     # set checkpointer, model save
     checkpointer = ModelCheckpoint(filepath=save_path+'model.hdf5', verbose=1, save_best_only=True)
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=1e-5)
 
     # save loss and acc
     csv_logger = CSVLogger(save_path + 'CSVLogger.csv')
@@ -115,7 +115,7 @@ model = {model_ver}
         steps_per_epoch = len(train_set), 
         epochs = epochs,
         #verbose = 2,
-        callbacks = [checkpointer, csv_logger]
+        callbacks = [checkpointer, csv_logger, reduce_lr]
     )
     print("Trainig End") 
    
