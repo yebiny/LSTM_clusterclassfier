@@ -72,7 +72,7 @@ def main():
     
     print test_ver
     
-    # log
+    # save log
     log ='''
 [ {test_ver} ]
 
@@ -100,8 +100,10 @@ model = {model_ver}
     print("Save modelplot") 
     keras.utils.plot_model(model, to_file=save_path+'model_plot.png', show_shapes=True, show_layer_names=True)
     
-    # set checkpointer, model save
+    # set checkpointer and save model
     checkpointer = ModelCheckpoint(filepath=save_path+'model.hdf5', verbose=1, save_best_only=True)
+    
+    # handle loss step
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=1e-5)
 
     # save loss and acc
@@ -119,7 +121,7 @@ model = {model_ver}
     )
     print("Trainig End") 
    
-    # save loos and acc 
+    # save loss and acc for draw
     print("Save loss and acc") 
     y_loss = history.history['loss']
     y_acc = history.history['acc']   
@@ -133,10 +135,11 @@ model = {model_ver}
         y_vacc = y_vacc
     )
 
-
     # evaluation
     print("Evaluation") 
-    train_s_res, train_b_res, test_s_res, test_b_res, test_y_true, test_y_score = evaluate(model, train_set, test_set)
+    train_s_res, train_b_res, 
+    test_s_res , test_b_res , 
+    test_y_true, test_y_score = evaluate(model, train_set, test_set)
 
     # save evaluation results
     print("Save results") 
@@ -151,7 +154,6 @@ model = {model_ver}
         test_sig_response = test_s_res,
         test_bkg_response = test_b_res,
     )
-    
 
 if __name__ == '__main__':
     main()

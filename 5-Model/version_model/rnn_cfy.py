@@ -2,7 +2,7 @@ from tensorflow import keras
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.utils import Sequence, plot_model
 from tensorflow.keras.layers import Dense, Input, Bidirectional, Dropout, Masking
-from tensorflow.keras.layers import LSTM, BatchNormalization
+from tensorflow.keras.layers import LSTM, BatchNormalization, Activation
 
 def version_1(x_shape):
 
@@ -83,15 +83,15 @@ def version_6(x_shape):
     model.add(Bidirectional(LSTM(128)))
     
     model.add(Dense(64, activation=None))
-    model.add(layers.BatchNormalization(axis=-1, momentum=0.99) 
+    model.add(BatchNormalization(axis=-1, momentum=0.99)) 
     model.add(Activation('relu'))
     
     model.add(Dense(32, activation=None))
-    model.add(layers.BatchNormalization(axis=-1, momentum=0.99) 
+    model.add(BatchNormalization(axis=-1, momentum=0.99)) 
     model.add(Activation('relu'))
     
     model.add(Dense(1, activation=None))
-    model.add(layers.BatchNormalization(axis=-1, momentum=0.99) 
+    model.add(BatchNormalization(axis=-1, momentum=0.99)) 
     model.add(Activation('sigmoid'))
 
     model.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
