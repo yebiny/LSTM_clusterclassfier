@@ -74,17 +74,18 @@ class CMesonDataset(Sequence):
             x.append(x_array)
             
             # Set y 
-            y_array = np.array(self.tree.dau_label, dtype=np.int64)
+            y_array = [np.array(self.tree.dau_label, dtype=np.int64)]
+            y_array = np.stack(y_array, axis=-1)
+            
             #y_array = y_array[order_pt]
             y.append(y_array)
 
         x = keras.preprocessing.sequence.pad_sequences(x, maxlen=self.max_len, padding='post', truncating='post', dtype=np.float32)
         y = keras.preprocessing.sequence.pad_sequences(y, maxlen=self.max_len, padding='post', truncating='post', dtype=np.int64)
         return x, y
-    
+
 def get_datasets(folder_path, batch_size, max_len):
     dataset = glob.glob(folder_path+'*.root')
-    print(dataset)	
     datasets = [
         CMesonDataset(dataset[0], batch_size, max_len),
         CMesonDataset(dataset[1], batch_size, max_len),
@@ -96,17 +97,21 @@ def get_datasets(folder_path, batch_size, max_len):
 
 def main():
     batch_size = 10
-    max_len = 5
+    max_len = 30
 
     folder_name = sys.argv[1]	
     folder_path = '../3-Selector/{}/'.format(folder_name)	
-    print(folder_name, folder_path)
     train_set, val_set, test_set = get_datasets(folder_path, batch_size, max_len)
 
-    print("Train Set : ",train_set, len(train_set) )
-    print("Val Set : ",val_set, len(val_set) )
-    print("Test Set : ",test_set, len(test_set) )
-    print(train_set[0])
+    print"Train Set : ", len(train_set) 
+    print"Val Set : ", len(val_set) 
+    print"Test Set : ", len(test_set) 
+    
+    tmp_x, tmp_y = train_set[5]
+    print tmp_x
+    print tmp_y
+    print tmp_x.shape, tmp_y.shape
+    
 
 if __name__ == '__main__':
     main()
