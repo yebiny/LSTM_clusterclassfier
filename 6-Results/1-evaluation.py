@@ -11,7 +11,7 @@ from numpy import argmax
 from array import array
 
 sys.path.append("../5-Model")
-from model_cfy import build_model
+#from model_cfy import build_model
 sys.path.append("../4-Dataset")
 from dataset_cfy import get_datasets
 
@@ -50,14 +50,15 @@ def evaluate(model, train_set, test_set):
 
 def main():
 
-    #default
-    batch_size = 256
-    max_len = 25
+    data_name='mg_3_rec'
+    batch_size=256
+    max_len=25
 
     # set name
     data_name = sys.argv[1]
     data_path = '../3-Selector/'+data_name+'/'
     save_path = './'+sys.argv[2]
+    #save_path = './ver_6'
 
     print("Loading dataset.")
     train_set, val_set, test_set = get_datasets(data_path, batch_size, max_len)
@@ -75,7 +76,8 @@ def main():
     
     print("Save results")
     np.savez(
-        save_path+'/info_eval.npz',
+        #save_path+'/info_eval.npz',
+        './ver_6/info_eval.npz',
         # responce
         train_sig_response = train_s_res,
         train_bkg_response = train_b_res,

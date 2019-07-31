@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import os
-#os.environ['CUDA_VISIBLE_DEVICES'] = "0" 
+#os.environ['CUDA_VISIBLE_DEVICES'] = "1" 
 import ROOT, sys
 import numpy as np
 from ROOT   import TLorentzVector
@@ -24,7 +24,6 @@ def getyinfo(model, xset):
     for idx in range(len(xset)):
         x, y = xset[idx]
         y_predict = model.predict_on_batch(x)
-        
         y_true.append(y)
         y_score.append(y_predict)
    
@@ -70,7 +69,7 @@ def main():
     save_path = save_fold+test_ver+'/'
     os.mkdir(save_path)
     
-    print test_ver
+    print 'Save folder: ',test_ver
     
     # save log
     log ='''
@@ -92,9 +91,15 @@ model = {model_ver}
     train_set, val_set, test_set = get_datasets(data_path, batch_size, max_len)
     tmp_x, tmp_y = train_set[0]
     x_shape = tmp_x.shape
-
+    print 'X Shape: ',tmp_x.shape
+    print 'Y Shape: ',tmp_y.shape
+    
     # set model
-    model = get_model_fn(model_ver)(x_shape)
+    if "version" in model_ver:
+        model = get_model_fn(model_ver)(x_shape)
+    else: 
+        model = load_model("/home/yyoun/deepcmeson/6-Results/cfy/"+model_ver+"/model.hdf5")
+        #model = load_model("/home/yyoun/deepcmeson/6-Results/bfres/classify/pwg_1_full/v5_ep30/rnn_model.h5")
 
     # save model plot
     print("Save modelplot") 
@@ -137,9 +142,7 @@ model = {model_ver}
 
     # evaluation
     print("Evaluation") 
-    train_s_res, train_b_res, 
-    test_s_res , test_b_res , 
-    test_y_true, test_y_score = evaluate(model, train_set, test_set)
+    train_s_res, train_b_res, test_s_res , test_b_res , test_y_true, test_y_score = evaluate(model, train_set, test_set)
 
     # save evaluation results
     print("Save results") 

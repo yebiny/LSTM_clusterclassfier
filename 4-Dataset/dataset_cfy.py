@@ -23,10 +23,10 @@ class CMesonDataset(Sequence):
             'track_dphi',
             #'track_d0',
             'track_dz',
-            'track_xd',
-            'track_yd',
-            'track_zd',
-            'track_l',
+            #'track_xd',
+            #'track_yd',
+            #'track_zd',
+            #'track_l',
             'track_errd0', 
             'track_charge',
         ]
@@ -73,8 +73,10 @@ class CMesonDataset(Sequence):
             if (self.tree.jet_label >= 4): y_value = 1
             else:
                  y_value = 0
-            y.append(y_value) 
-
+            y_array = [np.array(y_value, dtype = np.int64)]
+            y_array = np.stack(y_array)
+            y.append(y_array)  
+  
         x = keras.preprocessing.sequence.pad_sequences(x, maxlen=self.max_len, padding='post', truncating='post', dtype=np.float32)
         y = np.array(y)
         return x, y
@@ -91,18 +93,21 @@ def get_datasets(data_path, batch_size, max_len):
     return train_set, val_set, test_set
 
 def main():
-    batch_size = 1
+    batch_size = 2
     max_len = 10
 
     folder_name = sys.argv[1]	
     data_path = '/home/yyoun/deepcmeson/3-Selector/{}/'.format(folder_name)	
-    
     train_set, val_set, test_set = get_datasets(data_path, batch_size, max_len)
-    print("Train Set : ",train_set, len(train_set) )
-    print("Val Set : ",val_set, len(val_set) )
-    print("Test Set : ",test_set, len(test_set) )
-    print("=====================================================================")
-    print(train_set[1])
+    
+    print"Train Set : ", len(train_set)
+    print"Val Set : ", len(val_set)
+    print"Test Set : ", len(test_set)
 
+    tmp_x, tmp_y = train_set[87311]
+    print tmp_x
+    print tmp_y
+    print tmp_x.shape, tmp_y.shape
+    
 if __name__ == '__main__':
     main()

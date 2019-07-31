@@ -97,6 +97,37 @@ def version_6(x_shape):
     model.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
     return model
 
+def version_7(x_shape):
+
+    model = Sequential()
+    model.add(Bidirectional(LSTM(512, return_sequences=True), input_shape=(x_shape[1],x_shape[2])))
+    model.add(Bidirectional(LSTM(128)))
+    
+    model.add(Dropout(0.5))
+    model.add(Dense(64, activation='relu'))
+    
+    model.add(Dropout(0.5))
+    model.add(Dense(32, activation='relu'))
+    
+    model.add(Dropout(0.5))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
+    return model
+
+def version_8(x_shape):
+
+    model = Sequential()
+    
+    model.add(Bidirectional(LSTM(128, dropout=0.3, return_sequences=True), input_shape=(x_shape[1],x_shape[2])))
+    model.add(Bidirectional(LSTM(256, dropout=0.3, return_sequences=True)))
+    model.add(Bidirectional(LSTM(64, dropout=0.3)))
+    model.add(Dense(32, activation='relu'))
+    
+    model.add(Dropout(0.3))
+    model.add(Dense(1, activation='sigmoid'))
+    
+    model.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
+    return model
 ZOO = {
     'version_1': version_1,
     'version_2': version_2,
@@ -104,6 +135,8 @@ ZOO = {
     'version_4': version_4,
     'version_5': version_5,
     'version_6': version_6,
+    'version_7': version_7,
+    'version_8': version_8,
 }
 
 def get_model_fn(model_ver):
