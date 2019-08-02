@@ -4,6 +4,7 @@ from tensorflow.keras.utils import Sequence, plot_model
 from tensorflow.keras.layers import Dense, Input, Bidirectional, Dropout, Masking
 from tensorflow.keras.layers import LSTM, BatchNormalization, Activation, TimeDistributed
 from tensorflow.keras import backend as K
+from tensorflow.python.keras.utils.generic_utils import get_custom_objects
 
 def rec_acc(y_true, y_pred):
     # y_true: (batch_size, maxlen, 1)
@@ -145,3 +146,11 @@ ZOO = {
 
 def get_model_fn(model_ver):
     return ZOO[model_ver]
+
+
+_CUSTOM_OBJECTS = [
+    rec_acc,
+]
+for each in _CUSTOM_OBJECTS:
+    key = each.func_name
+    get_custom_objects()[key] = each

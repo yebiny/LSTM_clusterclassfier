@@ -59,9 +59,14 @@ model = {model_ver}
     train_set, val_set, test_set = get_datasets(data_path, batch_size, max_len)
     tmp_x, tmp_y = train_set[0]
     x_shape = tmp_x.shape
+    print 'X Shape: ',tmp_x.shape
+    print 'Y Shape: ',tmp_y.shape
 
     # set model
-    model = get_model_fn(model_ver)(x_shape)
+    if "version" in model_ver:
+        model = get_model_fn(model_ver)(x_shape)
+    else: 
+        model = load_model("/home/yyoun/deepcmeson/6-Results/rec/"+model_ver+"/model.hdf5")
 
     # save model plot
     print("Save modelplot") 
@@ -88,31 +93,5 @@ model = {model_ver}
     )
     print("Trainig End") 
    
-    # save loss and acc for draw
-    #print("Save loss and acc") 
-    #y_loss = history.history['loss']
-    #y_acc = history.history['acc']   
-    #y_vloss = history.history['val_loss']
-    #y_vacc = history.history['val_acc']   
-    #np.savez(
-    #    save_path+'info_learning.npz',
-    #    y_loss = y_loss,
-    #    y_acc = y_acc,
-    #    y_vloss = y_vloss,
-    #    y_vacc = y_vacc
-    #)
-
-    #np.savez(
-    #    save_path+'info_eval.npz',
-    #    # roc curve
-    #    test_y_true = test_y_true,
-    #    test_y_score=test_y_score,
-    #    # responce 
-    #    train_sig_response=train_s_res,
-    #    train_bkg_response=train_b_res,
-    #    test_sig_response = test_s_res,
-    #    test_bkg_response = test_b_res,
-    #)
-
 if __name__ == '__main__':
     main()
