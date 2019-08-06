@@ -113,24 +113,30 @@ def version_6(x_shape):
     model.add(Masking(mask_value=0.,input_shape=(x_shape[1],x_shape[2])))
     model.add(Bidirectional(LSTM(128, return_sequences=True)))
     model.add(Bidirectional(LSTM(64, return_sequences=True)))
+    
     model.add(Dropout(0.5))
     model.add(TimeDistributed(Dense(32, activation='relu')))
+    
     model.add(Dropout(0.5))
     model.add(TimeDistributed(Dense(1, activation='sigmoid')))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=[rec_acc] )
     return model
 
-# Resize batch
 def version_7(x_shape):
 
     model = Sequential()
     model.add(Masking(mask_value=0.,input_shape=(x_shape[1],x_shape[2])))
-    model.add(Bidirectional(LSTM(256, return_sequences=True)))
-    model.add(Bidirectional(LSTM(512, return_sequences=True)))
-    model.add(Dropout(0.5))
-    model.add(TimeDistributed(Dense(64, activation='relu')))
-    model.add(Dropout(0.5))
-    model.add(TimeDistributed(Dense(1, activation='sigmoid')))
+    model.add(Bidirectional(LSTM(128, return_sequences=True)))
+    model.add(Bidirectional(LSTM(64, return_sequences=True)))
+    
+    model.add(TimeDistributed(Dense(32, activation=None)))
+    model.add(BatchNormalization(axis=-1, momentum=0.99)) 
+    model.add(Activation('relu'))
+   
+    model.add(TimeDistributed(Dense(1, activation=None)))
+    model.add(BatchNormalization(axis=-1, momentum=0.99)) 
+    model.add(Activation('sigmoid'))
+    
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=[rec_acc] )
     return model
 

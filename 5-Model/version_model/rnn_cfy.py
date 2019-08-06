@@ -117,17 +117,25 @@ def version_7(x_shape):
 def version_8(x_shape):
 
     model = Sequential()
+    model.add(Masking(mask_value=0.,input_shape=(x_shape[1],x_shape[2])))
+    model.add(Bidirectional(LSTM(64, return_sequences=True), input_shape=(x_shape[1],x_shape[2])))
+    model.add(Bidirectional(LSTM(128)))
     
-    model.add(Bidirectional(LSTM(128, dropout=0.3, return_sequences=True), input_shape=(x_shape[1],x_shape[2])))
-    model.add(Bidirectional(LSTM(256, dropout=0.3, return_sequences=True)))
-    model.add(Bidirectional(LSTM(64, dropout=0.3)))
-    model.add(Dense(32, activation='relu'))
+    model.add(Dense(64, activation=None))
+    model.add(BatchNormalization(axis=-1, momentum=0.99)) 
+    model.add(Activation('relu'))
     
-    model.add(Dropout(0.3))
-    model.add(Dense(1, activation='sigmoid'))
+    model.add(Dense(32, activation=None))
+    model.add(BatchNormalization(axis=-1, momentum=0.99)) 
+    model.add(Activation('relu'))
     
+    model.add(Dense(1, activation=None))
+    model.add(BatchNormalization(axis=-1, momentum=0.99)) 
+    model.add(Activation('sigmoid'))
+
     model.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
     return model
+
 ZOO = {
     'version_1': version_1,
     'version_2': version_2,

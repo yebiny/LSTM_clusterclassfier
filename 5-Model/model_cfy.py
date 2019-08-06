@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "1" 
+os.environ['CUDA_VISIBLE_DEVICES'] = "5" 
 import ROOT, sys
 import numpy as np
 from ROOT   import TLorentzVector
